@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1584205420 source:d:\users\axel\4to semestre\estructura de datos\clase\graficas\main.cpp
+	<iostream>
+
+1775501400 source:d:\users\axel\4to semestre\estructura de datos\clase\graficas\grafica.cpp
+	"Grafica.hpp"
+
+1775500871 d:\users\axel\4to semestre\estructura de datos\clase\graficas\grafica.hpp
+	<string>
+
