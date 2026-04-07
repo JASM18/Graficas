@@ -120,7 +120,7 @@ void Grafica::Vaciar()
 
 bool Grafica::BuscarNodo(string nombre) const
 {
-
+    return obtenerDireccDeUnNodo(nombre);
 }
 
 //***********************************
