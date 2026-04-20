@@ -21,19 +21,19 @@ public:
     void AgregarNodo(string nombre); // LISTO
     void AgregarArista(string origen, string destino); // LISTO
 
-    bool EliminarNodo(string nombre);
-    bool EliminarArista(string origen, string destino);
+    bool EliminarNodo(string nombre); // LISTO
+    bool EliminarArista(string origen, string destino); // LISTO
 
-    int ObtenerGradoDeNodo(string nombre) const;
+    int ObtenerGradoDeNodo(string nombre) const; //LISTO
     int ObtenerNumNodos() const; // LISTO
     int ObtenerNumAristas() const; // LISTO
 
     bool EstaVacia() const; // LISTO
 
-    bool EsConexo() const;
+    bool EsConexo() const; //LISTO
 
-    void VaciarNodo(string nodo);
-    void Vaciar();
+    void VaciarNodo(string nodo); // LISTO
+    void Vaciar(); // LISTO
 
     bool BuscarNodo(string nombre) const; // LISTO
     bool BuscarArista(string origen, string destino) const; // LISTO

@@ -1,5 +1,9 @@
 #include "Grafica.hpp"
 
+#include <iostream>
+
+using std::cout, std::endl, std::string;
+
 //***********************************
 // CONSTRUCTORES
 //***********************************
@@ -24,15 +28,41 @@ Grafica::~Grafica()
 
 Grafica::Grafica(const Grafica& grafica)
 {
+    numNodos = 0;
+    numAristas = 0;
+    primero = nullptr;
+    ultimo = nullptr;
 
+    *this = grafica;
 }
 
 //***********************************
 
 Grafica& Grafica::operator=(const Grafica& grafica)
 {
-    if (this == &grafica) return *this;
+    if(this == &grafica) return *this;
 
+    Vaciar();
+
+    Nodo *visitado = grafica.primero;
+
+    while(visitado != nullptr){
+        AgregarNodo(visitado->Nombre);
+        visitado = visitado->siguiente;
+    }
+
+    //aristas
+    visitado = grafica.primero;
+
+    while(visitado != nullptr){
+        Arista *aristaVis = visitado->primero;
+        while(aristaVis != nullptr){
+
+            AgregarArista(visitado->Nombre, aristaVis->adyacente->Nombre);
+            aristaVis = aristaVis->siguiente;
+        }
+        visitado = visitado->siguiente;
+    }
 
     return *this;
 }
@@ -63,7 +93,7 @@ void Grafica::AgregarNodo(string nombre)
 
         ++numNodos;
     }catch(std::bad_alloc&){
-        //throw EXCEPCION
+        throw GraficaNoMemoria();
     }
 }
 
@@ -125,21 +155,93 @@ void Grafica::AgregarArista(string origen, string destino)
 
 bool Grafica::EliminarNodo(string nombre)
 {
+    Nodo *porBorrar = obtenerDireccDeUnNodo(nombre);
+    if(porBorrar == nullptr) return false;
 
+    VaciarNodo(nombre);
+
+    Nodo *actual = primero;
+    Nodo *anterior = nullptr;
+
+    while(actual != nullptr && actual != porBorrar){
+        anterior = actual;
+        actual = actual->siguiente;
+    }
+
+    if(anterior == nullptr){
+        primero = actual->siguiente;
+    }else{
+        anterior->siguiente = actual->siguiente;
+    }
+
+    if(actual == ultimo){
+        ultimo = anterior;
+    }
+
+    delete actual;
+    numNodos--;
+    return true;
 }
 
 //***********************************
 
 bool Grafica::EliminarArista(string origen, string destino)
 {
+    if(!BuscarArista(origen, destino)) return false;
 
+    Nodo *nodoOrigen = obtenerDireccDeUnNodo(origen);
+    Nodo *nodoDestino = obtenerDireccDeUnNodo(destino);
+
+    // Eliminamos el nodo de destino
+
+    Arista *actual = nodoOrigen->primero;
+    Arista *anterior = nullptr;
+    while(actual != nullptr && actual->adyacente != nodoDestino){
+        anterior = actual;
+        actual = actual->siguiente;
+    }
+
+    if(actual != nullptr){
+        if(anterior == nullptr) nodoOrigen->primero = actual->siguiente;
+        else anterior->siguiente = actual->siguiente;
+
+        if(actual == nodoOrigen->ultima) nodoOrigen->ultima = anterior;
+
+        delete actual;
+        nodoOrigen->grado--;
+    }
+
+    // Eliminamos el nodo de origen
+    actual = nodoDestino->primero;
+    anterior = nullptr;
+    while(actual != nullptr && actual->adyacente != nodoOrigen){
+        anterior = actual;
+        actual = actual->siguiente;
+    }
+
+    if(actual != nullptr){
+        if(anterior == nullptr) nodoDestino->primero = actual->siguiente;
+        else anterior->siguiente = actual->siguiente;
+
+        if(actual == nodoDestino->ultima) nodoDestino->ultima = anterior;
+
+        delete actual;
+        nodoDestino->grado--;
+    }
+
+    numAristas--;
+    return true;
 }
 
 //***********************************
 
 int Grafica::ObtenerGradoDeNodo(string nombre) const
 {
-
+    Nodo *n = obtenerDireccDeUnNodo(nombre);
+    if(n != nullptr){
+        return n->grado;
+    }
+    return -1; // Si el nodo no existe
 }
 
 //***********************************
@@ -167,21 +269,73 @@ bool Grafica::EstaVacia() const
 
 bool Grafica::EsConexo() const
 {
+    if (EstaVacia()) return false;
+    if (numNodos == 1) return true;
 
+    Nodo** cola = new Nodo*[numNodos];
+    Nodo** nodosVisitados = new Nodo*[numNodos];
+
+    int numVisitados = 0;
+    int inicioCola = 0, finCola = 0;
+
+    cola[finCola++] = primero;
+    nodosVisitados[numVisitados++] = primero;
+
+    while(inicioCola < finCola){
+        Nodo* actual = cola[inicioCola++];
+
+        // Checamos a todos los vecinos de este nodo
+        Arista* arista = actual->primero;
+        while(arista != nullptr){
+            Nodo* ady = arista->adyacente;
+
+            // Verificamos si ya lo visitamos antes
+            bool visitado = false;
+            for(int i = 0; i < numVisitados; ++i){
+                if(nodosVisitados[i] == ady){
+                    visitado = true;
+                    break;
+                }
+            }
+
+            // Si es nuevo, lo metemos a la cola
+            if(!visitado){
+                nodosVisitados[numVisitados++] = ady;
+                cola[finCola++] = ady;
+            }
+            arista = arista->siguiente;
+        }
+    }
+
+    // Si pudimos visitar todos los nodos, la grafica es conexa
+    bool conexo = (numVisitados == numNodos);
+
+    delete[] cola;
+    delete[] nodosVisitados;
+
+    return conexo;
 }
 
 //***********************************
 
 void Grafica::VaciarNodo(string nodo)
 {
+    Nodo *nodoActual = obtenerDireccDeUnNodo(nodo);
+    if(nodoActual == nullptr) return;
 
+    while(nodoActual->primero != nullptr){
+        string destino = nodoActual->primero->adyacente->Nombre;
+        EliminarArista(nodo, destino);
+    }
 }
 
 //***********************************
 
 void Grafica::Vaciar()
 {
-
+    while(primero != nullptr){
+        EliminarNodo(primero->Nombre);
+    }
 }
 
 //***********************************
@@ -216,6 +370,30 @@ bool Grafica::BuscarArista(string origen, string destino) const
 
 void Grafica::Imprimir() const
 {
+    if(EstaVacia()){
+        cout << "La grafica esta vac\241a." << endl;
+        return;
+    }
+
+    Nodo *visitado = primero;
+
+    //cout << "Lista de Adyacencia" << endl;
+
+    while(visitado != nullptr){
+        cout << "[" << visitado->Nombre << "] (" << visitado->grado << " aristas) -> ";
+
+        Arista *aristaVis = visitado->primero;
+        if(aristaVis == nullptr){
+            cout << "Sin conexiones";
+        }
+
+        while(aristaVis != nullptr){
+            cout << "(" << aristaVis->adyacente->Nombre << ") ";
+            aristaVis = aristaVis->siguiente;
+        }
+        cout << endl;
+        visitado = visitado->siguiente;
+    }
 
 }
 
