@@ -11,6 +11,7 @@ using std::string;
 //para eliminar, primero se birran las arisras y luego el nodo
 
 class Grafica {
+    friend std::ostream & operator <<(std::ostream & salida, const Grafica &g);
 public:
 
     Grafica();
@@ -43,14 +44,8 @@ public:
 
     class GraficaNoMemoria : public std::exception {
     public:
-//        /** \brief Constructor por default de la excepci&oacute;n ColaVacia.
-//         */
         GraficaNoMemoria() throw();
 
-//        /** \brief Devuelve una descripci&oacute;n del error al intentar operar con una lista vac&iacute;a.
-//         *
-//         * \return Cadena de caracteres con el mensaje de error.
-//         */
         virtual const char *what() const throw();
     };
 

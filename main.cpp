@@ -21,8 +21,7 @@ int main()
         grafica.AgregarArista("C", "D");
         grafica.AgregarArista("D", "E");
 
-        cout << "\nESTADO INICIAL:" << endl;
-        grafica.Imprimir();
+        cout << "\nESTADO INICIAL:\n" << grafica <<endl;
 
         cout << "Orden (n\243mero de Nodos): " << grafica.ObtenerNumNodos() << endl;
         cout << "Tama\244o (n\243mero de Aristas): " << grafica.ObtenerNumAristas() << endl;
@@ -32,19 +31,19 @@ int main()
         cout << "\nEliminando la conexi\242n entre C y D" << endl;
         grafica.EliminarArista("C", "D");
 
-        grafica.Imprimir();
+        cout << grafica << endl;
         cout << "Tama\244o actualizado: " << grafica.ObtenerNumAristas() << endl;
-        cout << "Sigue siendo conexa?: " << (grafica.EsConexo() ? "S\241" : "No (Se partio en dos)") << endl;
+        cout << "Es conexa?: " << (grafica.EsConexo() ? "S\241" : "No (Se partio en dos)") << endl;
 
         cout << "Eliminando el nodo A (esto deberia borrar sus aristas hacia B y C)" << endl;
         grafica.EliminarNodo("A");
 
-        grafica.Imprimir();
-        cout << "Orden actualizado: " << grafica.ObtenerNumNodos() << endl;
+        cout << "\n" << grafica << endl;
+        cout << "Orden (n\243mero de Nodos): " << grafica.ObtenerNumNodos() << endl;
 
         cout << "Vaciando la grafica por completo..." << endl;
         grafica.Vaciar();
-        grafica.Imprimir();
+        cout << grafica;
 
     } catch (const exception& e) {
         cerr << "Ocurri\242 un error: " << e.what() << endl;
@@ -52,7 +51,7 @@ int main()
         cerr << "Ocurri\242 un error inesperado." << endl;
     }
 
-    cout << "\nPrueba terminada. ";
+    cout << endl;
     system("pause");
     return 0;
 }

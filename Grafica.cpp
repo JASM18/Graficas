@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-using std::cout, std::endl, std::string;
+using std::cout;
+using std::endl;
+using std::string;
 
 //***********************************
 // CONSTRUCTORES
@@ -147,7 +149,7 @@ void Grafica::AgregarArista(string origen, string destino)
         ++nodoDestino->grado;
         ++numAristas;
     }catch(const std::bad_alloc&){
-        //throw EXCEPCION
+        throw GraficaNoMemoria();
     }
 }
 
@@ -192,7 +194,7 @@ bool Grafica::EliminarArista(string origen, string destino)
     Nodo *nodoOrigen = obtenerDireccDeUnNodo(origen);
     Nodo *nodoDestino = obtenerDireccDeUnNodo(destino);
 
-    // Eliminamos el nodo de destino
+    //Se elimina el nodo de destino
 
     Arista *actual = nodoOrigen->primero;
     Arista *anterior = nullptr;
@@ -211,7 +213,7 @@ bool Grafica::EliminarArista(string origen, string destino)
         nodoOrigen->grado--;
     }
 
-    // Eliminamos el nodo de origen
+    // Se elimina el nodo de origen
     actual = nodoDestino->primero;
     anterior = nullptr;
     while(actual != nullptr && actual->adyacente != nodoOrigen){
@@ -229,7 +231,7 @@ bool Grafica::EliminarArista(string origen, string destino)
         nodoDestino->grado--;
     }
 
-    numAristas--;
+    --numAristas;
     return true;
 }
 
@@ -284,7 +286,7 @@ bool Grafica::EsConexo() const
     while(inicioCola < finCola){
         Nodo* actual = cola[inicioCola++];
 
-        // Checamos a todos los vecinos de este nodo
+        // Se checa todos los vecinos de este nodo
         Arista* arista = actual->primero;
         while(arista != nullptr){
             Nodo* ady = arista->adyacente;
@@ -377,21 +379,20 @@ void Grafica::Imprimir() const
 
     Nodo *visitado = primero;
 
-    //cout << "Lista de Adyacencia" << endl;
-
     while(visitado != nullptr){
-        cout << "[" << visitado->Nombre << "] (" << visitado->grado << " aristas) -> ";
+        cout << "[" << visitado->Nombre << "]: ";
 
         Arista *aristaVis = visitado->primero;
         if(aristaVis == nullptr){
-            cout << "Sin conexiones";
+            cout << "No tiene aristas.";
         }
 
         while(aristaVis != nullptr){
-            cout << "(" << aristaVis->adyacente->Nombre << ") ";
+            cout << "(" << aristaVis->adyacente->Nombre << "), ";
             aristaVis = aristaVis->siguiente;
         }
-        cout << endl;
+
+        cout << "\b\b " << endl;
         visitado = visitado->siguiente;
     }
 
@@ -435,4 +436,14 @@ Grafica::Nodo* Grafica::obtenerDireccDeUnNodo(string nombre) const
     }
 
     return nullptr;
+}
+
+//**********************************
+// Flujos sobrecargados de entrada y salida
+//**********************************
+
+std::ostream & operator<<(std::ostream & salida, const Grafica &g)
+{
+    g.Imprimir();
+    return salida;
 }
